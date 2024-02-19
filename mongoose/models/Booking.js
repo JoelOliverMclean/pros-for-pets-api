@@ -33,9 +33,10 @@ const bookingSchema = new Schema(
       get: retrieveCost,
       set: storeCost,
     },
-    confirmed: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: ["PENDING", "CONFIRMED", "REJECTED"],
+      default: "PENDING",
     },
     paid: {
       type: Boolean,
@@ -44,6 +45,10 @@ const bookingSchema = new Schema(
   },
   { toJSON: { getters: true, virtuals: true } }
 );
+
+bookingSchema.virtual("confirmed").get(function () {
+  return this.status === "CONFIRMED";
+});
 
 const Booking = model("Booking", bookingSchema);
 module.exports = Booking;

@@ -7,6 +7,7 @@ const {
   BusinessUserPet,
   BookingSlot,
   Service,
+  Booking,
 } = require("../mongoose/models");
 const { getBookingSlots } = require("../beans/BookingSlotBean");
 const moment = require("moment");
@@ -47,7 +48,6 @@ router.post("/", async (req, res) => {
 
 router.get("/", async (req, res) => {
   let { pageSize, page, tense, service } = req.query;
-  console.log(req.query);
   let business = await Business.findOne({
     owner: req.user,
   }).populate("services");
@@ -61,6 +61,23 @@ router.get("/", async (req, res) => {
   return res
     .status(200)
     .json({ bookingSlots, pages, results, services: business.services });
+});
+
+router.post("/review-request", async (req, res) => {
+  let { booking_id, accepted } = req.body;
+  if (booking_id === undefined) {
+    return res.status(409).json({ error: "Param 'booking_id' required" });
+  }
+  if (accepted === undefined) {
+    return res.status(409).json({ error: "Param 'accepted' required" });
+  }
+  let booking = await Booking.findById(booking_id).exec();
+  if (!booking) {
+    return res.status(404).json({ error: "Cannot find booking" });
+  }
+  booking.status = accepted ? "CONFIRMED" : "REJECTED";
+  await booking.save();
+  return res.status(200).json({});
 });
 
 module.exports = router;

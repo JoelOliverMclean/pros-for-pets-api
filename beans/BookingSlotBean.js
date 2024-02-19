@@ -90,7 +90,7 @@ const getBookingRequests = async (business, user) => {
   }
   let bookingRequests = await Booking.find({
     business,
-    confirmed: false,
+    status: "PENDING",
     // end_time: { $gte: moment().startOf("day") },
   })
     .populate([
