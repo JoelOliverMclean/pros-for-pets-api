@@ -28,7 +28,14 @@ router.get("/dashboard", async (req, res) => {
             {
               path: "businessUserPet",
               select: "pet",
-              populate: { path: "pet", select: "name slug" },
+              populate: {
+                path: "pet",
+                select: "name slug owner",
+                populate: {
+                  path: "owner",
+                  select: "firstname lastname username",
+                },
+              },
             },
           ],
         },
