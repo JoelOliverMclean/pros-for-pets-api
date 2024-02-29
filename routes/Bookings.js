@@ -85,14 +85,15 @@ router.post("/request", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  let { pageSize, page, tense, service } = req.query;
+  let { pageSize, page, tense, service, payment } = req.query;
   let result = await getBookings(
     parseInt(pageSize),
     parseInt(page ?? 0),
     [],
     tense,
     req.user,
-    service
+    service,
+    payment
   );
   return res.status(200).json(result);
 });

@@ -12,17 +12,20 @@ const getBookings = async (
   businessSlugs,
   tense,
   user,
-  service = null
+  service = null,
+  payment = null
 ) => {
   const pipeline = [];
   pipeline.push({
     $match: {
       start_time:
-        tense === "PAST"
+        tense === "PAST" || payment === "OUTSTANDING"
           ? { $lt: moment().toDate() }
           : tense === "FUTURE"
           ? { $gte: moment().toDate() }
           : { $ne: null },
+      payment: payment ? payment : { $ne: null },
+      status: payment === "OUTSTANDING" ? "CONFIRMED" : { $ne: null },
     },
   });
   pipeline.push({
