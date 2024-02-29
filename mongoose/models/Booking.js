@@ -48,7 +48,9 @@ const bookingSchema = new Schema(
       default: false,
     },
   },
-  { toJSON: { getters: true, virtuals: true } }
+  {
+    toJSON: { getters: true, virtuals: true },
+  }
 );
 
 bookingSchema.virtual("confirmed").get(function () {

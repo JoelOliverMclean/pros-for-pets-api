@@ -30,7 +30,7 @@ const getBookingSlots = async (
       businessUser,
     }).exec();
     let bookings = await Booking.find({
-      businessUserPet: { $in: businessUserPets },
+      businessUserPet: { $all: businessUserPets },
     }).exec();
     if (businessUser) {
       where.bookings = { $nin: bookings };
@@ -106,7 +106,6 @@ const getBookingRequests = async (business, user) => {
     .sort({
       start_time: "asc",
     });
-  console.log(bookingRequests);
   return bookingRequests;
 };
 

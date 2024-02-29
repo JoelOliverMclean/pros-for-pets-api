@@ -55,7 +55,7 @@ app.use(
   require("./routes/ManageServices")
 );
 app.use("/api/businesses", require("./routes/public/Businesses"));
-app.use("/api/bookings", validateTokenSecured, require("./routes/Bookings"));
+app.use("/api/bookings", validateToken, require("./routes/Bookings"));
 app.use(
   "/api/business-user",
   validateTokenSecured,

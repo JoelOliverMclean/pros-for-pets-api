@@ -6,7 +6,7 @@ const {
   BusinessUserPet,
   Booking,
 } = require("../mongoose/models");
-const { getBookings } = require("../beans/BookingBean");
+const { getBookings, getBookingsAsSlots } = require("../beans/BookingBean");
 
 router.post("/request", async (req, res) => {
   let { slotId, petId } = req.body;
@@ -58,7 +58,8 @@ router.post("/request", async (req, res) => {
 
   if (
     bookingSlot.bookings.some(
-      (booking) => booking.businessUserPet === businessUserPet
+      (booking) =>
+        String(booking.businessUserPet._id) === String(businessUserPet._id)
     )
   ) {
     return res.status(409).json({ error: "Booking already requested" });
@@ -86,6 +87,19 @@ router.post("/request", async (req, res) => {
 router.get("/", async (req, res) => {
   let { pageSize, page, tense, service } = req.query;
   let result = await getBookings(
+    parseInt(pageSize),
+    parseInt(page ?? 0),
+    [],
+    tense,
+    req.user,
+    service
+  );
+  return res.status(200).json(result);
+});
+
+router.get("/asSlots", async (req, res) => {
+  let { pageSize, page, tense, service } = req.query;
+  let result = await getBookingsAsSlots(
     parseInt(pageSize),
     parseInt(page ?? 0),
     [],
