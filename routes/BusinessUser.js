@@ -35,4 +35,43 @@ router.post("/apply/:id", async (req, res) => {
     .json({ error: `${business.name} will now review the request` });
 });
 
+router.get("/", async (req, res) => {
+  let pros = await BusinessUser.find({ user: req.user })
+    .populate([
+      "business",
+      {
+        path: "businessUserPets",
+        populate: {
+          path: "bookings",
+          populate: [
+            { path: "business", select: "name slug" },
+            {
+              path: "bookingSlot",
+              select:
+                "_id start_time end_time cost location info locationLink service",
+              populate: { path: "service", select: "name" },
+            },
+            {
+              path: "businessUserPet",
+              select: "pet",
+              populate: {
+                path: "pet",
+                select: "name slug owner",
+                populate: {
+                  path: "owner",
+                  select: "firstname lastname username",
+                },
+              },
+            },
+          ],
+        },
+      },
+    ])
+    .exec();
+
+  res.status(200).json({
+    pros,
+  });
+});
+
 module.exports = router;

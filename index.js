@@ -44,7 +44,6 @@ app.use(
   validateTokenSecured,
   require("./routes/ManageBusiness")
 );
-app.use("/api/user", validateTokenSecured, require("./routes/User"));
 app.use(
   "/api/manage-booking-slots",
   validateTokenSecured,
@@ -56,7 +55,7 @@ app.use(
   require("./routes/ManageServices")
 );
 app.use("/api/businesses", require("./routes/public/Businesses"));
-app.use("/api/bookings", require("./routes/public/Bookings"));
+app.use("/api/bookings", validateTokenSecured, require("./routes/Bookings"));
 app.use(
   "/api/business-user",
   validateTokenSecured,

@@ -38,6 +38,11 @@ const bookingSchema = new Schema(
       enum: ["PENDING", "CONFIRMED", "REJECTED"],
       default: "PENDING",
     },
+    payment: {
+      type: String,
+      enum: ["OUTSTANDING", "PENDING", "CONFIRMED"],
+      default: "OUTSTANDING",
+    },
     paid: {
       type: Boolean,
       default: false,

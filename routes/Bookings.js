@@ -5,10 +5,10 @@ const {
   Pet,
   BusinessUserPet,
   Booking,
-} = require("../../mongoose/models");
-const { validateToken } = require("../../middleware/AuthMiddleware");
+} = require("../mongoose/models");
+const { getBookings } = require("../beans/BookingBean");
 
-router.post("/request", validateToken, async (req, res) => {
+router.post("/request", async (req, res) => {
   let { slotId, petId } = req.body;
   if (!slotId)
     return res.status(409).json({ error: "Booking Slot ID required" });
@@ -81,6 +81,19 @@ router.post("/request", validateToken, async (req, res) => {
   await businessUserPet.save();
 
   return res.status(200).json(booking);
+});
+
+router.get("/", async (req, res) => {
+  let { pageSize, page, tense, service } = req.query;
+  let result = await getBookings(
+    parseInt(pageSize),
+    parseInt(page ?? 0),
+    [],
+    tense,
+    req.user,
+    service
+  );
+  return res.status(200).json(result);
 });
 
 module.exports = router;
