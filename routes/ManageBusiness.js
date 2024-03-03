@@ -3,6 +3,7 @@ const router = express.Router();
 const slugify = require("slugify");
 const { Business, User, BusinessUser } = require("../mongoose/models");
 const { getBookingRequests } = require("../beans/BookingSlotBean");
+const { getMyBusiness } = require("../beans/BusinessBean");
 
 router.post("/", async (req, res) => {
   let { name, description, phone, email, website, address, id } = req.body;
@@ -14,7 +15,7 @@ router.post("/", async (req, res) => {
     if (!business) {
       return res.status(401).json({ error: "Business does not exist" });
     }
-    if (business.owner !== req.user) {
+    if (String(business.owner) !== String(req.user._id)) {
       return res.status(401).json({ error: "You are not the business owner" });
     }
   } else {
@@ -59,22 +60,10 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const business = await Business.findOne({
-    owner: req.user,
-  })
-    .populate(["services"])
-    .populate({
-      path: "businessUsers",
-      populate: [
-        { path: "user" },
-        { path: "businessUserPets", populate: "pet" },
-      ],
-    })
-    .lean()
-    .exec();
+  const { business, status } = await getMyBusiness(req.user);
   let bookingRequests = [];
   if (business) bookingRequests = await getBookingRequests(business, req.user);
-  return res.status(200).json({ business, bookingRequests });
+  return res.status(200).json({ business, status, bookingRequests });
 });
 
 router.post("/review-user/:id", async (req, res) => {

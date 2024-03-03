@@ -30,9 +30,10 @@ const businessSchema = new Schema(
     address: {
       type: String,
     },
-    approved: {
-      type: Boolean,
-      default: false,
+    approvalStatus: {
+      type: String,
+      enum: ["PENDING", "CONFIRMED", "REJECTED"],
+      default: "PENDING",
     },
     paymentInstructions: {
       type: String,

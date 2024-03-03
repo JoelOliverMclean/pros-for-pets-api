@@ -3,7 +3,7 @@ const moment = require("moment");
 
 const getBusinesses = async (pageSize, page, searchTerm) => {
   let where = {
-    approved: true,
+    approvalStatus: "CONFIRMED",
   };
   if (searchTerm && searchTerm.length > 0) {
     where.name = {
@@ -30,4 +30,26 @@ const getBusinesses = async (pageSize, page, searchTerm) => {
   };
 };
 
-module.exports = { getBusinesses };
+const getMyBusiness = async (user) => {
+  let business = await Business.findOne({
+    owner: user,
+  })
+    .populate(["services"])
+    .populate({
+      path: "businessUsers",
+      populate: [
+        { path: "user" },
+        { path: "businessUserPets", populate: "pet" },
+      ],
+    })
+    .lean()
+    .exec();
+  let result = {};
+  if (business) {
+    if (business.approvalStatus === "CONFIRMED") result.business = business;
+    result.status = business.approvalStatus;
+  }
+  return result;
+};
+
+module.exports = { getBusinesses, getMyBusiness };
