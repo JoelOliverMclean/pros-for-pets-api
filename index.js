@@ -4,17 +4,23 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const csrf = require("csurf");
+const path = require("path");
+const fs = require("fs");
 const {
   validateToken,
   validateTokenSecured,
 } = require("./middleware/AuthMiddleware");
 const mongoose = require("mongoose");
 
+const static_path = __dirname + "/views/";
+
+app.use(express.static(static_path));
+
 // Configure Cross Origin Resources
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: process.env.URL_PREFIX,
   })
 );
 
@@ -68,21 +74,14 @@ app.use(
 );
 app.use("/api/services", require("./routes/public/Services"));
 
-app.get("/", async (req, res) => {
-  let superuser = await models.User.findOne({
-    username: "admin",
-  }).exec();
-  if (!superuser) {
-    res.json({ success: false });
-  } else {
-    res.json({
-      success: true,
-      name: `${superuser.firstname} ${superuser.lastname}`,
-    });
-  }
+app.get("/*", function (req, res, next) {
+  res.sendFile(path.join(static_path, "index.html"));
 });
 
 require("./mongoose").seed();
+
+const imagePath = path.join(__dirname, "/public/userimages/");
+if (!fs.existsSync(imagePath)) fs.mkdirSync(imagePath, { recursive: true });
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
