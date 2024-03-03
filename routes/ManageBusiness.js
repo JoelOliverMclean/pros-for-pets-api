@@ -72,6 +72,7 @@ router.get("/", async (req, res) => {
     })
     .lean()
     .exec();
+  console.log(business);
   let bookingRequests = await getBookingRequests(business, req.user);
   return res.status(200).json({ business, bookingRequests });
 });
@@ -100,6 +101,26 @@ router.post("/review-user/:id", async (req, res) => {
     await BusinessUser.deleteOne({ id: businessUser.id });
   }
   return res.status(200).json({ approved });
+});
+
+router.post("/payment-instructions", async (req, res) => {
+  let { paymentInstructions } = req.body;
+  if (paymentInstructions === undefined) {
+    return res
+      .status(403)
+      .json({ error: "Body param 'paymentInstructions' required" });
+  }
+  let business = await Business.findOne({
+    owner: req.user._id,
+  }).exec();
+  if (!business) {
+    return res.status(403).json({
+      error: "Couldn't find your business",
+    });
+  }
+  business.paymentInstructions = paymentInstructions;
+  await business.save();
+  return res.status(200).json({ paymentInstructions });
 });
 
 module.exports = router;

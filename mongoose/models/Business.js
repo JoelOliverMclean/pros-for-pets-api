@@ -34,6 +34,9 @@ const businessSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    paymentInstructions: {
+      type: String,
+    },
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
