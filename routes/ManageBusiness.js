@@ -72,8 +72,8 @@ router.get("/", async (req, res) => {
     })
     .lean()
     .exec();
-  console.log(business);
-  let bookingRequests = await getBookingRequests(business, req.user);
+  let bookingRequests = [];
+  if (business) bookingRequests = await getBookingRequests(business, req.user);
   return res.status(200).json({ business, bookingRequests });
 });
 
