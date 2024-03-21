@@ -80,6 +80,7 @@ const getBookings = async (
           $project: {
             name: 1,
             slug: 1,
+            paymentInstructions: 1,
           },
         },
       ],

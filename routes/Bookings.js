@@ -98,6 +98,28 @@ router.get("/", async (req, res) => {
   return res.status(200).json(result);
 });
 
+router.post("/pay/:id", async (req, res) => {
+  let { id } = req.params;
+  if (!id) return res.status(403).json({ error: "Param 'id' required." });
+  const booking = await Booking.findById(id).populate({
+    path: "businessUserPet",
+    populate: {
+      path: "pet",
+      populate: {
+        path: "owner",
+        populate: "_id",
+      },
+    },
+  });
+  if (String(booking.businessUserPet.pet.owner.id) !== String(req.user.id))
+    return res.status(404).json({ error: "Booking not found." });
+  if (booking.payment === "CONFIRMED")
+    return res.status(403).json({ error: "Booking already marked as paid." });
+  booking.payment = "CONFIRMED";
+  await booking.save();
+  return res.status(200).json({ message: "Booking marked as paid" });
+});
+
 router.get("/asSlots", async (req, res) => {
   let { pageSize, page, tense, service } = req.query;
   let result = await getBookingsAsSlots(
